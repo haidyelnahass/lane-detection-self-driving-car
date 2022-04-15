@@ -1,2 +1,2 @@
-# advanced-lane-detection
-Advanced Lane Detection for self driving cars.
+# Lane Detection
+Lane Detection for self driving cars.
