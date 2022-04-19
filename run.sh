@@ -2,7 +2,7 @@
 num_of_arguments=$#
 
 if [ $num_of_arguments -lt 2 ] || [ $num_of_arguments -gt 3 ]; then
-    echo "Usage: ./run.sh <input_file> <output_file> -d (optional)"
+    echo "Usage: ./run.sh <input_file> <output_file> -d (for debug mode 'optional')"
     exit 1
 
 elif [ $num_of_arguments -eq 2 ]; then
