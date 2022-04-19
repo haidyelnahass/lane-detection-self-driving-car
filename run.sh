@@ -1,7 +1,7 @@
 # number of arguments after the script name
 num_of_arguments=$#
 
-if [ $num_of_arguments -eq 1 ] || [ $num_of_arguments -gt 3 ]; then
+if [ $num_of_arguments -lt 2 ] || [ $num_of_arguments -gt 3 ]; then
     echo "Usage: ./run.sh <input_file> <output_file> -d (optional)"
     exit 1
 
