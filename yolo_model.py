@@ -25,9 +25,7 @@ def detect_objects(
         nmsThreshold: Optional[float] = 0.5,
         )->\
             Tuple[
-                List[
-                    Union[int,int,int,int]
-                    ],
+                List[Union[int,int,int,int]],
                     List[str]]:
     """
     Detect objects in an image. and draw it's boxes
@@ -103,7 +101,7 @@ def draw_boxes(
     ----------
     img : ARRAY
         The image to draw boxes on.
-    bbox : List[int, int, int, int]
+    bbox : List[Union[int,int,int,int]]
         The bounding boxes to draw.
     labels : List[str]
         The labels of the bounding boxes.
