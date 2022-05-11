@@ -390,6 +390,8 @@ def main():
         if(isDebugMode):
             final = overlayImage(final, transformedImage, 20, 80, 30)
             final = overlayImage(final, windowImage, 20, 200, 30)
+            final = overlayImage(final, cannyImage, 1000, 80, 15)
+            final = overlayImage(final, maskedImage, 1000, 200, 15)
 
         # CALCULATIONS
         distance_from_center = calculate_center_distance(
