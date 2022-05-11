@@ -1,9 +1,10 @@
+"""lane-detection.py"""
 import imageio
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
-
+from yolo_model import detect_objects, draw_boxes
 
 def threshold_rel(img, lo, hi):
     vmin = np.min(img)
@@ -400,6 +401,9 @@ def main():
         )
         )
 
+        # model prediction
+        bbox, label = detect_objects(finalResultImage)
+        finalResultImage = draw_boxes(finalResultImage, bbox, label)
         finalVid.append_data(finalResultImage)
     finalVid.close()
     print('Done!')
