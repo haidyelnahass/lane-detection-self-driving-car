@@ -15,14 +15,19 @@ CLASSES = [line.strip() for line in open(CLASSESPATH, "r").readlines()]
 COLORS = np.random.uniform(0, 255, size=(len(CLASSES), 3))
 
 layer_names = net.getLayerNames()
-output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
+output_layers = []
+
+if cv2.__version__ != '4.5.3':
+    output_layers = [layer_names[i - 1] for i in net.getUnconnectedOutLayers()]
+else:
+    output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
 
 def detect_objects(
         img: ARRAY,
         size: Optional[Tuple[int,int]] = (416, 416),
         scale: Optional[float] = 0.00392,
-        confThreshold: Optional[float] = 0.4,
-        nmsThreshold: Optional[float] = 0.5,
+        conf_threshold: Optional[float] = 0.4,
+        nms_threshold: Optional[float] = 0.5,
         )->\
             Tuple[
                 List[Union[int,int,int,int]],
@@ -38,9 +43,9 @@ def detect_objects(
         The size of the image to detect objects in.
     scale : Optional[float]
         The scale of the image to detect objects in.
-    confThreshold : Optional[float]
+    conf_threshold : Optional[float]
         The confidence threshold to use.
-    nmsThreshold : Optional[float]
+    nms_threshold : Optional[float]
         The NMS threshold to use.
 
     Returns
@@ -64,7 +69,7 @@ def detect_objects(
             scores = detection[5:]
             class_id = np.argmax(scores)
             confidence = scores[class_id]
-            if confidence > 0.5:
+            if confidence > conf_threshold:
                 # Object detected
                 center_x = int(detection[0] * width)
                 center_y = int(detection[1] * height)
@@ -80,12 +85,18 @@ def detect_objects(
                 class_ids.append(class_id)
     # Perform non maximum suppression to eliminate redundant overlapping boxes with
     # lower confidences
-    indices = cv2.dnn.NMSBoxes(boxes, confidences, confThreshold, nmsThreshold)
-    for ind in indices:
-        ind = ind[0]
-        x, y, w, h = boxes[ind]
-        bbox.append([int(x), int(y), int(x+w), int(y+h)])
-        labels.append(str(CLASSES[class_ids[ind]]))
+    indices = cv2.dnn.NMSBoxes(boxes, confidences, conf_threshold, nms_threshold)
+    if cv2.__version__ != '4.5.3':
+        for ind in indices:
+            x, y, w, h = boxes[ind]
+            bbox.append([int(x), int(y), int(x+w), int(y+h)])
+            labels.append(str(CLASSES[class_ids[ind]]))
+    else:
+        for ind in indices:
+            ind = ind[0]
+            x, y, w, h = boxes[ind]
+            bbox.append([int(x), int(y), int(x+w), int(y+h)])
+            labels.append(str(CLASSES[class_ids[ind]]))
 
     return bbox, labels
 
@@ -115,6 +126,6 @@ def draw_boxes(
     for ind, label in enumerate(labels):
         color = COLORS[ind]
         cv2.rectangle(img, (bbox[ind][0],bbox[ind][1]), (bbox[ind][2],bbox[ind][3]), color, 2)
-        cv2.putText(img, label, (bbox[ind][0],bbox[ind][1]-10), FONT, 0.5, color, 2)
+        cv2.putText(img, str(label + str(ind+1)), (bbox[ind][0],bbox[ind][1]-10), FONT, 0.5, color, 2)
 
     return img
