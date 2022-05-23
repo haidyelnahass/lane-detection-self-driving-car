@@ -24,7 +24,7 @@ else:
 
 def detect_objects(
         img: ARRAY,
-        size: Optional[Tuple[int,int]] = (416, 416),
+        size: Optional[Tuple[int, int]] = (416, 416),
         scale: Optional[float] = 0.00392,
         conf_threshold: Optional[float] = 0.4,
         nms_threshold: Optional[float] = 0.5,
@@ -56,12 +56,13 @@ def detect_objects(
         The labels of the objects.
     """
 
-    blob = cv2.dnn.blobFromImage(img, scale, size, (0, 0, 0), False, crop=False)
+    blob = cv2.dnn.blobFromImage(
+        img, scale, size, (0, 0, 0), False, crop=False)
     net.setInput(blob)
     # predict
     outs = net.forward(output_layers)
 
-    width , height = img.shape[1], img.shape[0]
+    width, height = img.shape[1], img.shape[0]
     class_ids, confidences, boxes, bbox, labels = [], [], [], [], []
 
     for out in outs:
@@ -83,6 +84,7 @@ def detect_objects(
                 boxes.append([new_x, new_y, rel_width, rel_height])
                 confidences.append(float(confidence))
                 class_ids.append(class_id)
+
     # Perform non maximum suppression to eliminate redundant overlapping boxes with
     # lower confidences
     indices = cv2.dnn.NMSBoxes(boxes, confidences, conf_threshold, nms_threshold)
@@ -100,11 +102,12 @@ def detect_objects(
 
     return bbox, labels
 
+
 def draw_boxes(
     img: ARRAY,
-    bbox: List[Union[int,int,int,int]],
+    bbox: List[Union[int, int, int, int]],
     labels: List[str],
-    )->ARRAY:
+) -> ARRAY:
     """
     Draw boxes on an image.
 
@@ -125,7 +128,9 @@ def draw_boxes(
 
     for ind, label in enumerate(labels):
         color = COLORS[ind]
-        cv2.rectangle(img, (bbox[ind][0],bbox[ind][1]), (bbox[ind][2],bbox[ind][3]), color, 2)
-        cv2.putText(img, str(label + str(ind+1)), (bbox[ind][0],bbox[ind][1]-10), FONT, 0.5, color, 2)
+        cv2.rectangle(img, (bbox[ind][0], bbox[ind][1]),
+                      (bbox[ind][2], bbox[ind][3]), color, 2)
+        cv2.putText(img, str(label + str(ind+1)), (bbox[ind][0],
+                    bbox[ind][1]-10), FONT, 0.5, color, 2)
 
     return img

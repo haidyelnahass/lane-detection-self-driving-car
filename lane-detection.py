@@ -355,7 +355,7 @@ def main():
 
     MOV_AVG_LENGTH = 5
     # WARNING NOTE: operation takes time...
-    print('Processing video, please wait...')
+    # Processing Video
 
     for i, img in enumerate(vid):
 
@@ -408,7 +408,7 @@ def main():
         finalResultImage = draw_boxes(finalResultImage, bbox, label)
         finalVid.append_data(finalResultImage)
     finalVid.close()
-    print('Done!')
+    
     return
 
 

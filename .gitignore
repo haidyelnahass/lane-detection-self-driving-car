@@ -133,3 +133,7 @@ dmypy.json
 assets/
 test.py
 model/yolo.weights
+
+Deliverables
+names-and-repo-link.pdf
+test_time.ipynb
