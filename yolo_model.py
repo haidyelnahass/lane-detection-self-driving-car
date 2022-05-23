@@ -15,18 +15,19 @@ CLASSES = [line.strip() for line in open(CLASSESPATH, "r").readlines()]
 COLORS = np.random.uniform(0, 255, size=(len(CLASSES), 3))
 
 layer_names = net.getLayerNames()
-output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
+output_layers = [layer_names[i - 1] for i in net.getUnconnectedOutLayers()]
+
 
 def detect_objects(
         img: ARRAY,
-        size: Optional[Tuple[int,int]] = (416, 416),
+        size: Optional[Tuple[int, int]] = (416, 416),
         scale: Optional[float] = 0.00392,
         confThreshold: Optional[float] = 0.4,
         nmsThreshold: Optional[float] = 0.5,
-        )->\
-            Tuple[
-                List[Union[int,int,int,int]],
-                    List[str]]:
+) ->\
+        Tuple[
+    List[Union[int, int, int, int]],
+        List[str]]:
     """
     Detect objects in an image. and draw it's boxes
 
@@ -51,12 +52,13 @@ def detect_objects(
         The labels of the objects.
     """
 
-    blob = cv2.dnn.blobFromImage(img, scale, size, (0, 0, 0), False, crop=False)
+    blob = cv2.dnn.blobFromImage(
+        img, scale, size, (0, 0, 0), False, crop=False)
     net.setInput(blob)
     # predict
     outs = net.forward(output_layers)
 
-    width , height = img.shape[1], img.shape[0]
+    width, height = img.shape[1], img.shape[0]
     class_ids, confidences, boxes, bbox, labels = [], [], [], [], []
 
     for out in outs:
@@ -64,7 +66,7 @@ def detect_objects(
             scores = detection[5:]
             class_id = np.argmax(scores)
             confidence = scores[class_id]
-            if confidence > 0.5:
+            if confidence > confThreshold:
                 # Object detected
                 center_x = int(detection[0] * width)
                 center_y = int(detection[1] * height)
@@ -78,22 +80,24 @@ def detect_objects(
                 boxes.append([new_x, new_y, rel_width, rel_height])
                 confidences.append(float(confidence))
                 class_ids.append(class_id)
+
     # Perform non maximum suppression to eliminate redundant overlapping boxes with
     # lower confidences
     indices = cv2.dnn.NMSBoxes(boxes, confidences, confThreshold, nmsThreshold)
     for ind in indices:
-        ind = ind[0]
+        # ind = ind[0]
         x, y, w, h = boxes[ind]
         bbox.append([int(x), int(y), int(x+w), int(y+h)])
         labels.append(str(CLASSES[class_ids[ind]]))
 
     return bbox, labels
 
+
 def draw_boxes(
     img: ARRAY,
-    bbox: List[Union[int,int,int,int]],
+    bbox: List[Union[int, int, int, int]],
     labels: List[str],
-    )->ARRAY:
+) -> ARRAY:
     """
     Draw boxes on an image.
 
@@ -114,7 +118,9 @@ def draw_boxes(
 
     for ind, label in enumerate(labels):
         color = COLORS[ind]
-        cv2.rectangle(img, (bbox[ind][0],bbox[ind][1]), (bbox[ind][2],bbox[ind][3]), color, 2)
-        cv2.putText(img, label, (bbox[ind][0],bbox[ind][1]-10), FONT, 0.5, color, 2)
+        cv2.rectangle(img, (bbox[ind][0], bbox[ind][1]),
+                      (bbox[ind][2], bbox[ind][3]), color, 2)
+        cv2.putText(img, str(label + str(ind+1)), (bbox[ind][0],
+                    bbox[ind][1]-10), FONT, 0.5, color, 2)
 
     return img
